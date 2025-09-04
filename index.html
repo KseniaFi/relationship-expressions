@@ -206,6 +206,10 @@
     background: rgba(255,110,199,1);
   }
 </style>
+
+<!-- Подключаем библиотеки html2canvas и jsPDF из CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -434,7 +438,7 @@
     container.appendChild(createCard(word));
   });
 
-  // Раскрыть все определения перед печатью
+  // Раскрыть все определения перед сохранением PDF
   function expandAllDefinitions() {
     document.querySelectorAll('.definition').forEach(def => {
       def.classList.add('show');
@@ -446,7 +450,7 @@
     });
   }
 
-  // Свернуть определения после печати
+  // Свернуть определения после сохранения PDF
   function collapseAllDefinitions() {
     document.querySelectorAll('.definition').forEach(def => {
       def.classList.remove('show');
@@ -458,17 +462,39 @@
     });
   }
 
-  // Кнопка печати: сначала раскрыть определения, затем открыть диалог печати
-  document.getElementById('printBtn').addEventListener('click', () => {
+  // Нажатие кнопки — сохранить как PDF без окна печати
+  document.getElementById('printBtn').addEventListener('click', async () => {
     expandAllDefinitions();
-    setTimeout(() => {
-      window.print();
-    }, 250);
-  });
 
-  window.onafterprint = () => {
+    // Ждём, чтобы визуально раскрытие применилось (0.3 секунды)
+    await new Promise(res => setTimeout(res, 300));
+
+    const { jsPDF } = window.jspdf;
+    const container = document.getElementById('cardsContainer');
+
+    // Получаем canvas из html2canvas
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      backgroundColor: null
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+
+    // Создаём PDF размером по размеру canvas
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    });
+
+    // Добавляем изображение
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+
+    // Сохраняем PDF
+    pdf.save('Cards.pdf');
+
     collapseAllDefinitions();
-  };
+  });
 </script>
 </body>
 </html>
