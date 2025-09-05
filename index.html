@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Vocabulary Cards with Background and Scroll</title>
 <style>
-  /* Фон всего проекта — вне карточек */
+  /* ваши стили из вопроса без изменений */
   body, html {
     margin: 0;
     padding: 0;
@@ -15,8 +15,6 @@
     background-size: cover;
     color: #fff;
   }
-
-  /* Контейнер с карточками, поверх фонового изображения */
   .cards-container {
     position: relative;
     z-index: 1;
@@ -26,7 +24,6 @@
     flex-direction: column;
     gap: 40px;
   }
-
   .card {
     position: relative;
     background-position: center center;
@@ -38,32 +35,35 @@
     user-select: none;
     color: #fff;
     min-height: 280px;
-    max-height: 420px;
+    max-height: none;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    align-items: flex-start;
   }
-
-  .phrase-container {
-    display: flex;
-    align-items: center;
-    background-color: rgba(0,0,0,0.65);
-    border-radius: 15px;
-    padding: 15px 20px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.8);
-    user-select: text;
-    position: relative;
-    z-index: 2;
-  }
-
+ .phrase-container {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0,0,0,0.65);
+  border-radius: 15px;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  padding-left: 1em;
+  padding-right: 1em;
+  box-shadow: 0 0 15px rgba(0,0,0,0.8);
+  user-select: text;
+  position: relative;
+  z-index: 2;
+}
   .phrase {
     font-size: 1.6rem;
     font-weight: bold;
     font-family: "Georgia", serif;
     line-height: 1.3;
-    flex-grow: 1;
+    flex-grow: 0;
+   flex-shrink: 1; 
+   white-space: normal;
   }
-
   .toggle-thumbnail {
     width: 40px;
     height: 40px;
@@ -78,7 +78,6 @@
   .toggle-thumbnail.open {
     transform: rotate(45deg) scale(1.1);
   }
-
   .definition {
     margin-top: 15px;
     background-color: rgba(0,0,0,0.7);
@@ -89,22 +88,17 @@
     font-family: "Arial", sans-serif;
     font-size: 1.3rem;
     line-height: 1.5;
-
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-
     transition: max-height 0.5s ease, opacity 0.5s ease;
     user-select: text;
   }
-
   .definition.show {
     max-height: 180px;
     opacity: 1;
     overflow-y: auto;
   }
-
-  /* Яркий прокрутка определения */
   .definition.show::-webkit-scrollbar {
     width: 12px;
   }
@@ -121,71 +115,6 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255,110,199,0.85) rgba(255,110,199,0.3);
   }
-
-  /* Стили для печати */
-  @media print {
-    body, html {
-      background: url('images/IMG_20250903_205933_659.jpg') no-repeat center center fixed !important;
-      background-size: cover !important;
-      color: black !important;
-      margin: 0;
-      padding: 0;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-    .cards-container {
-      max-width: 100% !important;
-      margin: 0;
-      padding: 0;
-    }
-    .card {
-      page-break-inside: avoid;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-
-      background-repeat: no-repeat !important;
-      background-size: cover !important;
-      background-position: center center !important;
-
-      box-shadow: 0 0 20px rgba(0,0,0,0.3) !important;
-      border-radius: 20px !important;
-      padding: 20px !important;
-      color: black !important;
-      max-height: none !important;
-      min-height: 320px !important;
-      overflow: visible !important;
-      margin-bottom: 30px !important;
-      break-inside: avoid;
-    }
-    .phrase-container {
-      background-color: rgba(255 255 255 / 0.8) !important;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1) !important;
-      color: black !important;
-      padding: 10px 15px !important;
-      border-radius: 15px !important;
-    }
-    .phrase {
-      font-size: 1.3rem !important;
-      font-weight: bold !important;
-      color: black !important;
-    }
-    .toggle-thumbnail {
-      display: none !important;
-    }
-    .definition {
-      max-height: none !important;
-      opacity: 1 !important;
-      overflow: visible !important;
-      background-color: rgba(255 255 255 / 0.85) !important;
-      color: black !important;
-      box-shadow: none !important;
-      border-radius: 12px !important;
-      padding: 10px 15px !important;
-      font-size: 1.1rem !important;
-      line-height: 1.4 !important;
-    }
-  }
-
   #printBtn {
     position: fixed;
     bottom: 20px;
@@ -207,27 +136,24 @@
   }
 </style>
 
-<!-- Подключаем библиотеки html2canvas и jsPDF из CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<div class="cards-container" id="cardsContainer" role="list" aria-label="Vocabulary cards list">
-  <!-- Здесь появятся карточки -->
-</div>
+<div class="cards-container" id="cardsContainer" role="list" aria-label="Vocabulary cards list"></div>
 
-<button id="printBtn" aria-label="Save or print all cards">Save / Print as PDF</button>
+<button id="printBtn" aria-label="Save or print all cards">Save as PDF</button>
 
 <script>
-  // Данные карточек
   const words = [
+    
     {
       phrase: "To live by using another person's money, food, or help without giving anything back or helping in return.",
       definition: "Sponge off someone",
       bg: "images/IMG_20250903_132958_730.jpg"
     },
-    {
+ {
       phrase: "To be in a situation or relationship that is in serious trouble and is likely to fail or end soon.",
       definition: "Be on the rocks",
       bg: "images/IMG_20250903_133840_184.jpg"
@@ -369,18 +295,16 @@
     },
     {
       phrase: "To love someone even if they don't love you back",
-      definition: "Carry a torch for someone",
+      definition: "Carry a torch for someone",
       bg: "images/IMG_20250904_173550_086.jpg"
     }
   ];
 
-  const thumbnailSrc = 'images/IMG_20250903_213428_796.jpg';
-  const container = document.getElementById('cardsContainer');
+  const thumbnailSrc = 'images/image.png';
 
   function createCard(word) {
     const card = document.createElement('article');
     card.classList.add('card');
-    card.setAttribute('role', 'listitem');
     card.style.backgroundImage = `url('${word.bg}')`;
     card.tabIndex = 0;
 
@@ -434,11 +358,9 @@
     return card;
   }
 
-  words.forEach(word => {
-    container.appendChild(createCard(word));
-  });
+  const container = document.getElementById('cardsContainer');
+  words.forEach(word => container.appendChild(createCard(word)));
 
-  // Раскрыть все определения перед сохранением PDF
   function expandAllDefinitions() {
     document.querySelectorAll('.definition').forEach(def => {
       def.classList.add('show');
@@ -450,7 +372,6 @@
     });
   }
 
-  // Свернуть определения после сохранения PDF
   function collapseAllDefinitions() {
     document.querySelectorAll('.definition').forEach(def => {
       def.classList.remove('show');
@@ -462,39 +383,34 @@
     });
   }
 
-  // Нажатие кнопки — сохранить как PDF без окна печати
   document.getElementById('printBtn').addEventListener('click', async () => {
     expandAllDefinitions();
 
-    // Ждём, чтобы визуально раскрытие применилось (0.3 секунды)
-    await new Promise(res => setTimeout(res, 300));
-
     const { jsPDF } = window.jspdf;
-    const container = document.getElementById('cardsContainer');
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    // Получаем canvas из html2canvas
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      backgroundColor: null
-    });
+    const cards = document.querySelectorAll('.card');
+    for (let i = 0; i < cards.length; i++) {
+      // Рендерим каждую карточку отдельно
+      const canvas = await html2canvas(cards[i], { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
 
-    const imgData = canvas.toDataURL('image/png');
+      // Вычисляем размеры для картинки в pdf (по ширине страницы)
+      const imgWidth = pdfWidth;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
 
-    // Создаём PDF размером по размеру canvas
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height]
-    });
+      // Для первой карточки просто добавляем, для остальных - новую страницу
+      if (i > 0) pdf.addPage();
 
-    // Добавляем изображение
-    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    }
 
-    // Сохраняем PDF
     pdf.save('Cards.pdf');
-
     collapseAllDefinitions();
   });
 </script>
+
 </body>
 </html>
