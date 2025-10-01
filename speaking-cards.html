@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking Cards</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-image: url('images/IMG_20250903_205933_659.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+        }
+        h1 {
+            text-align: center;
+            color: #ff4d94;
+            text-shadow: 0 0 10px #ff4d94, 0 0 20px #ff4d94;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background-color: #ff4d94;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px #ff4d94;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            min-width: 180px;
+        }
+        .btn:hover {
+            background-color: #ff66a3;
+            box-shadow: 0 0 25px #ff4d94;
+            transform: translateY(-3px);
+        }
+        .btn-reset {
+            background-color: #4d94ff;
+            box-shadow: 0 0 15px #4d94ff;
+        }
+        .btn-reset:hover {
+            background-color: #66a3ff;
+            box-shadow: 0 0 25px #4d94ff;
+        }
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+        }
+        .card {
+            width: 320px;
+            min-height: 420px;
+            perspective: 1000px;
+            margin-bottom: 25px;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.7);
+            border-radius: 15px;
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+        .card-front {
+            background-color: rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+        .card-front h3 {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 0;
+            color: #ff4d94;
+            text-shadow: 0 0 5px #ff4d94;
+            font-size: 1.5rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+            overflow-y: auto;
+        }
+        .card-back-content {
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 100%;
+            box-sizing: border-box;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-back h3 {
+            color: #ff4d94;
+            text-shadow: 0 0 5px #ff4d94;
+            margin-top: 0;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .card-back ol {
+            padding-left: 25px;
+            color: #fff;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .card-back li {
+            margin-bottom: 12px;
+            font-size: 15px;
+            line-height: 1.4;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        .flip-hint {
+            color: #ff4d94;
+            text-align: center;
+            margin-top: 20px;
+            text-shadow: 0 0 3px #ff4d94;
+        }
+        @media (max-width: 768px) {
+            .card {
+                width: 100%;
+                max-width: 320px;
+            }
+            .btn {
+                margin: 5px;
+                width: 90%;
+                min-width: 150px;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Speaking Cards</h1>
+        
+        <div class="controls">
+            <button class="btn" onclick="flipAllCards()">Flip All Cards</button>
+            <button class="btn btn-reset" onclick="startOver()">Start Over</button>
+            <button class="btn btn-reset" onclick="scrollToTop()">Scroll to Top</button>
+        </div>
+        
+        <div class="cards-container" id="cardsContainer">
+            <!-- Cards will be generated here by JavaScript -->
+        </div>
+        
+        <p class="flip-hint">Click on any card to flip it</p>
+    </div>
+
+    <script>
+        // Card data
+        const cardsData = [
+            {
+                title: "Sponge off someone",
+                frontImage: "images/IMG_20250903_132958_730.jpg",
+                backImage: "images/IMG_20250903_132958_730.jpg",
+                questions: [
+                    "What does it mean to \"sponge off someone\"?",
+                    "Why is the word \"sponge\" a good metaphor for this kind of behaviour?",
+                    "What is the difference between sponging off someone and temporarily asking for help when you are in a difficult situation?",
+                    "Why do you think some people become reliant on sponging off their friends or family instead of supporting themselves?",
+                    "What is the best way for a person to stop sponging off others and become more self-reliant?"
+                ]
+            },
+            {
+                title: "Be on the rocks",
+                frontImage: "images/IMG_20250903_133840_184.jpg",
+                backImage: "images/IMG_20250903_133840_184.jpg",
+                questions: [
+                    "What practical steps can a couple take if they realize their relationship is on the rocks?",
+                    "How might someone's behaviour change towards their partner if their relationship is on the rocks?"
+                ]
+            },
+            {
+                title: "Hold a grudge against someone",
+                frontImage: "images/IMG_20250903_134410_369.jpg",
+                backImage: "images/IMG_20250903_134410_369.jpg",
+                questions: [
+                    "What does it mean to \"hold a grudge against someone\"?",
+                    "Is it a good idea to tell someone you've been holding a grudge against them? Why or why not?",
+                    "What would you advise to someone who is holding a grudge against their best friend?",
+                    "How can holding a grudge for too long affect a person's mental health?"
+                ]
+            },
+            {
+                title: "Give someone the cold shoulder",
+                frontImage: "images/IMG_20250903_135012_981.jpg",
+                backImage: "images/IMG_20250903_135012_981.jpg",
+                questions: [
+                    "What exactly does it mean to \"give someone the cold shoulder\"?",
+                    "Is giving someone the cold shoulder an effective way to solve a problem, or does it usually make the situation worse? Why?"
+                ]
+            },
+            {
+                title: "Push someone's buttons",
+                frontImage: "images/IMG_20250903_141822_979.jpg",
+                backImage: "images/IMG_20250903_141822_979.jpg",
+                questions: [
+                    "In your opinion, is pushing someone's buttons a form of bullying? Why or why not?",
+                    "What is the best way to react when you feel someone is trying to push your buttons?"
+                ]
+            },
+            {
+                title: "Walk on eggshells",
+                frontImage: "images/IMG_20250903_141408_274.jpg",
+                backImage: "images/IMG_20250903_141408_274.jpg",
+                questions: [
+                    "Have you ever felt like you had to walk on eggshells around someone?",
+                    "What does it mean to \"walk on eggshells\" around someone?",
+                    "How is \"walking on eggshells\" different from just being polite or respectful?",
+                    "Is walking on eggshells more common in personal relationships or at work? Why?"
+                ]
+            },
+            {
+                title: "Cut someone off",
+                frontImage: "images/IMG_20250903_141829_796.jpg",
+                backImage: "images/IMG_20250903_141829_796.jpg",
+                questions: [
+                    "What would you do if your friend suddenly cut you off without any explanation?",
+                    "How is \"cutting someone off\" different from just taking a break from them?",
+                    "How might someone feel after being cut off by a close friend or a family member?"
+                ]
+            },
+            {
+                title: "Break up (with somebody)",
+                frontImage: "images/IMG_20250903_141205_089.jpg",
+                backImage: "images/IMG_20250903_141205_089.jpg",
+                questions: [
+                    "What does it mean to \"break up with somebody\" in a romantic context?",
+                    "How is \"breaking up\" different from just taking a short break in a relationship?",
+                    "What should someone avoid saying or doing during a breakup?"
+                ]
+            },
+            {
+                title: "Make up (with somebody)",
+                frontImage: "images/IMG_20250903_142004_589.jpg",
+                backImage: "images/IMG_20250903_142004_589.jpg",
+                questions: [
+                    "What does it mean to \"make up with somebody\" after an argument?",
+                    "Why is it sometimes hard to make up with someone even if you want to?"
+                ]
+            },
+            {
+                title: "Click with (someone)",
+                frontImage: "images/IMG_20250903_142424_795.jpg",
+                backImage: "images/IMG_20250903_142424_795.jpg",
+                questions: [
+                    "Have you ever felt an instant \"click\" with someone that later turned out to be mistaken? What happened, and why was the initial feeling deceptive?",
+                    "Describe the feeling of \"clicking\" with someone."
+                ]
+            },
+            {
+                title: "Open up (to somebody)",
+                frontImage: "images/IMG_20250903_143413_157.jpg",
+                backImage: "images/IMG_20250903_143413_157.jpg",
+                questions: [
+                    "Do you find it easy or difficult to open up to people? Why?",
+                    "What makes it so difficult for some people to reveal their true feelings?",
+                    "Have you ever completely opened up to someone and later regretted it? What happened that made you feel that way?"
+                ]
+            },
+            {
+                title: "Have someone's back",
+                frontImage: "images/IMG_20250903_141959_493.jpg",
+                backImage: "images/IMG_20250903_141959_493.jpg",
+                questions: [
+                    "Describe a particular situation when you knew, without a doubt, that someone had your back. What did they do or say to prove it?",
+                    "How does knowing someone has your back impact your confidence and willingness to take risks?"
+                ]
+            },
+            {
+                title: "Be head over heels (in love)",
+                frontImage: "images/IMG_20250903_142036_391.jpg",
+                backImage: "images/IMG_20250903_142036_391.jpg",
+                questions: [
+                    "What does it mean to be \"head over heels\" in love with someone? How might someone's behaviour change when they feel this way?",
+                    "What advice would you give to someone who is \"head over heels\" in love for the first time?"
+                ]
+            },
+            {
+                title: "Ask someone out",
+                frontImage: "images/IMG_20250904_172204_923.jpg",
+                backImage: "images/IMG_20250904_172204_923.jpg",
+                questions: [
+                    "Have you ever been \"asked out\" in a way that made you feel uncomfortable?",
+                    "What's the most tactful way to decline an invitation that makes you uncomfortable without causing offense?",
+                    "Why is it important to pay attention to body language and tone of voice when asking someone out?"
+                ]
+            }
+        ];
+
+        // Generate cards
+        function generateCards() {
+            const container = document.getElementById('cardsContainer');
+            
+            cardsData.forEach((cardData, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${index}`;
+                
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front" style="background-image: url('${cardData.frontImage}')">
+                            <h3>${cardData.title}</h3>
+                            <p>Click to flip</p>
+                        </div>
+                        <div class="card-back" style="background-image: url('${cardData.backImage}')">
+                            <div class="card-back-content">
+                                <h3>${cardData.title}</h3>
+                                <ol>
+                                    ${cardData.questions.map(q => `<li>${q}</li>`).join('')}
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    card.classList.toggle('flipped');
+                });
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Flip all cards
+        function flipAllCards() {
+            const cards = document.querySelectorAll('.card');
+            const allFlipped = Array.from(cards).every(card => card.classList.contains('flipped'));
+            
+            cards.forEach(card => {
+                if (allFlipped) {
+                    card.classList.remove('flipped');
+                } else {
+                    card.classList.add('flipped');
+                }
+            });
+        }
+
+        // Start Over function - reset all cards to front and scroll to top
+        function startOver() {
+            // Reset all cards to front side
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.remove('flipped');
+            });
+            
+            // Scroll to top with smooth animation
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            generateCards();
+        };
+    </script>
+</body>
+</html>
