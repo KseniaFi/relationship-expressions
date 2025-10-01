@@ -374,10 +374,16 @@
     });
   }
 
-  // Обработчик для кнопки Start Over - БЕЗ подтверждения
+  // Обработчик для кнопки Start Over - с прокруткой к началу
   document.getElementById('resetBtn').addEventListener('click', function() {
-    // Немедленный возврат к началу без диалога
+    // Закрываем все определения
     collapseAllDefinitions();
+    
+    // Прокручиваем к началу страницы с плавной анимацией
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   });
 </script>
 
